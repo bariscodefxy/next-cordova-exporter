@@ -1,0 +1,20 @@
+{
+    "name": "bariscodefx/next-cordova-exporter",
+    "description": "Export your next.js builds for Apache Cordova.",
+    "type": "project",
+    "require": {
+        "symfony/console": "^7.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "bariscodefx\\NextCordovaExporter\\": "src/NextCordovaExporter/"
+        }
+    },
+    "authors": [
+        {
+            "name": "bariscodefxy",
+            "email": "bariscodefx@protonmail.com"
+        }
+    ]
+}
