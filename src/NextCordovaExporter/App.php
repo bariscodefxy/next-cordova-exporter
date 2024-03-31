@@ -3,7 +3,7 @@
 
 require dirname(__DIR__, 2).'/vendor/autoload.php';
 
-use bariscodefx\NextCordovaExporter\exporter\Exporter;
+use NextCordovaExporter\Exporter;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,7 +18,7 @@ $application->setVersion('1.0.0');
 $application->register('export')
     ->addArgument('dir', InputArgument::REQUIRED, 'Directory of next.js export directory (ex: out, dist etc.).')
     ->setCode(function (InputInterface $input, OutputInterface $output): int {
-        (new Exporter($input->getArgument('dir')));
+        (new Exporter(new \NextCordovaExporter\Logger(), $input->getArgument('dir')));
 
         return Command::SUCCESS;
     });
