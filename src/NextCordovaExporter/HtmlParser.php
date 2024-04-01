@@ -17,7 +17,7 @@ final class HtmlParser extends LoggerClass
 
         $file = fopen($htmlFilePath, "r");
         $data = fread($file, filesize($htmlFilePath));
-        preg_match_all('/\"\/_next([0-9A-Za-z-_\/]+)\.(js|css|png|jpeg|webp|gif)\"/', $data, $matches);
+        preg_match_all('/\"\/_next(\/[0-9A-Za-z-_])*\/[0-9A-Za-z-_]\.(js|css|png|jpe?g|webp|gif)\"/', $data, $matches);
         $matches = $matches[0];
         foreach($matches as $key => $m)
         {
