@@ -8,7 +8,7 @@ final class HtmlParser extends LoggerClass
      * @param string $htmlFilePath
      * @return array|null
      */
-    public function getJSFiles(string $htmlFilePath): ?array
+    public function getFiles(string $htmlFilePath): ?array
     {
         if (!is_file($htmlFilePath)) {
             $this->getLogger()->error("HTML file not found.");
@@ -16,10 +16,15 @@ final class HtmlParser extends LoggerClass
         }
 
         $file = fopen($htmlFilePath, "r");
-        $data = fread($file, 1024*10);
-        preg_match_all('/\"\/_next([0-9A-Za-z-_\/]+)\.js\"/', $data, $matches);
+        $data = fread($file, filesize($htmlFilePath));
+        preg_match_all('/\"\/_next([0-9A-Za-z-_\/]+)\.(js|css|png|jpeg|webp|gif)\"/', $data, $matches);
+        $matches = $matches[0];
+        foreach($matches as $key => $m)
+        {
+            $matches[$key] = substr(substr($m, 1), 0, -1);
+        }
         fclose($file);
 
-        return $matches[0];
+        return $matches;
     }
 }

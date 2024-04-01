@@ -48,6 +48,16 @@ final class Exporter
     private int $startTime;
 
     /**
+     * @var AssetCopier
+     */
+    private AssetCopier $assetCopier;
+
+    /**
+     * @var HtmlSaver
+     */
+    private HtmlSaver $htmlSaver;
+
+    /**
      * Exporter constructor.
      * @param Logger $logger
      * @param string $directory
@@ -60,6 +70,8 @@ final class Exporter
         $this->nextScan = new NextScan($logger);
         $this->folderScan = new FolderScan($logger);
         $this->htmlParser = new HtmlParser($logger);
+        $this->assetCopier = new AssetCopier($logger);
+        $this->htmlSaver = new HtmlSaver($logger);
         $this->startTime = floor(microtime(true) * 1000);
 
         $this->startScan();
@@ -84,9 +96,29 @@ final class Exporter
             exit(1);
         }
 
-        $jsfiles = $this->htmlParser->getJSFiles($this->directory . DIRECTORY_SEPARATOR . "index.html");
+        $htmlFiles = $this->folderScan->scanHTMLFiles($this->directory);
 
-        //foreach($jsfiles as $file)
+        foreach($htmlFiles as $htmlFile) {
+            $files = $this->htmlParser->getFiles($htmlFile);
+            $out_dir = $this->directory . "_cordova";
+            $assets = [];
+            @mkdir($out_dir);
+
+            foreach ($files as $file) {
+                switch (pathinfo($file, PATHINFO_EXTENSION)) {
+                    case "js":
+                        $this->assetCopier->copy($this->directory . DIRECTORY_SEPARATOR . $file, $out_dir, "js");
+                        break;
+                    case "css":
+                        $this->assetCopier->copy($this->directory . DIRECTORY_SEPARATOR . $file, $out_dir, "css");
+                        break;
+                }
+                $assets[] = $this->directory . DIRECTORY_SEPARATOR . $file;
+            }
+
+            // save html file after end
+            $this->htmlSaver->save($htmlFile, $out_dir, $assets);
+        }
 
         $this->logger->info("Exporting finished in " . abs(floor(microtime(true) * 1000) - $this->startTime) . "ms!");
     }

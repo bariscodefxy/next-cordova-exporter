@@ -2,7 +2,7 @@
 
 namespace NextCordovaExporter;
 
-final class FolderValidate extends LoggerClass
+final class FolderValidate
 {
     /**
      * @param string $directory

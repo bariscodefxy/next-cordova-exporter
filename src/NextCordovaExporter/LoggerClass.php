@@ -2,12 +2,10 @@
 
 namespace NextCordovaExporter;
 
-use NextCordovaExporter\Logger;
-
 abstract class LoggerClass
 {
     /**
-     * @var \NextCordovaExporter\Logger
+     * @var Logger
      */
     private Logger $logger;
 
