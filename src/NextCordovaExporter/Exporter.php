@@ -53,9 +53,14 @@ final class Exporter
     private AssetCopier $assetCopier;
 
     /**
-     * @var HtmlSaver
+     * @var HtmlModifier
      */
-    private HtmlSaver $htmlSaver;
+    private HtmlModifier $htmlModifier;
+
+    /**
+     * @var WebpackModifier
+     */
+    private WebpackModifier $webpackModifier;
 
     /**
      * Exporter constructor.
@@ -71,7 +76,8 @@ final class Exporter
         $this->folderScan = new FolderScan($logger);
         $this->htmlParser = new HtmlParser($logger);
         $this->assetCopier = new AssetCopier($logger);
-        $this->htmlSaver = new HtmlSaver($logger);
+        $this->htmlModifier = new HtmlModifier($logger);
+        $this->webpackModifier = new WebpackModifier($logger);
         $this->startTime = floor(microtime(true) * 1000);
 
         $this->startScan();
@@ -96,28 +102,20 @@ final class Exporter
             exit(1);
         }
 
-        $htmlFiles = $this->folderScan->scanHTMLFiles($this->directory);
+        $files = $this->folderScan->scanFiles($this->directory);
 
-        foreach($htmlFiles as $htmlFile) {
-            $files = $this->htmlParser->getFiles($htmlFile);
-            $out_dir = $this->directory . "_cordova";
-            $assets = [];
-            @mkdir($out_dir);
+        $out_dir = $this->directory . "_cordova";
+        @mkdir($out_dir);
 
-            foreach ($files as $file) {
-                switch (pathinfo($file, PATHINFO_EXTENSION)) {
-                    case "js":
-                        $this->assetCopier->copy($this->directory . DIRECTORY_SEPARATOR . $file, $out_dir, "js");
-                        break;
-                    case "css":
-                        $this->assetCopier->copy($this->directory . DIRECTORY_SEPARATOR . $file, $out_dir, "css");
-                        break;
-                }
-                $assets[] = $this->directory . DIRECTORY_SEPARATOR . $file;
+        foreach ($files as $file) {
+            $this->assetCopier->copy($file, $out_dir, pathinfo($file, PATHINFO_EXTENSION));
+            if ( PathFunctions::getExtension($file) === "js" && str_starts_with(PathFunctions::getFileName($file), "webpack") )
+            {
+                $this->webpackModifier->modify($out_dir . "/js/" . PathFunctions::getBaseName($file));
+            } else if ( PathFunctions::getExtension($file) === "html" )
+            {
+                $this->htmlModifier->modify($file, $out_dir);
             }
-
-            // save html file after end
-            $this->htmlSaver->save($htmlFile, $out_dir, $assets);
         }
 
         $this->logger->info("Exporting finished in " . abs(floor(microtime(true) * 1000) - $this->startTime) . "ms!");
