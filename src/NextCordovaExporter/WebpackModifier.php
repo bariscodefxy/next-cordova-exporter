@@ -13,7 +13,7 @@ final class WebpackModifier extends LoggerClass
         if (!is_file($filepath))
         {
             $this->getLogger()->error("No webpack file found with name: $filepath");
-        } else if (pathinfo($filepath, PATHINFO_EXTENSION) !== "js") {
+        } else if (PathFunctions::getExtension($filepath) !== "js") {
             $this->getLogger()->error("Webpack file is not a JavaScript file.");
         }
 

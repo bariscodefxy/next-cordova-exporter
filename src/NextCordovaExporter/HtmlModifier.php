@@ -11,7 +11,7 @@ final class HtmlModifier extends LoggerClass
      */
     public function modify(string $from, string $to): void
     {
-        if(pathinfo($from, PATHINFO_EXTENSION) !== "html")
+        if(PathFunctions::getExtension($from) !== "html")
         {
             $this->getLogger()->error("File is not a HTML file.");
             exit(1);
@@ -27,7 +27,7 @@ final class HtmlModifier extends LoggerClass
         $pattern = "/\/_next\/static\/css\/(app\/)?/";
         $data = preg_replace($pattern, "css/", $data);
 
-        $file = fopen($to . DIRECTORY_SEPARATOR . pathinfo($from, PATHINFO_BASENAME), "w");
+        $file = fopen($to . DIRECTORY_SEPARATOR . PathFunctions::getBaseName($from), "w");
         fwrite($file, $data);
         fclose($file);
 

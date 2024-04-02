@@ -108,7 +108,7 @@ final class Exporter
         @mkdir($out_dir);
 
         foreach ($files as $file) {
-            $this->assetCopier->copy($file, $out_dir, pathinfo($file, PATHINFO_EXTENSION));
+            $this->assetCopier->copy($file, $out_dir, PathFunctions::getExtension($file));
             if ( PathFunctions::getExtension($file) === "js" && str_starts_with(PathFunctions::getFileName($file), "webpack") )
             {
                 $this->webpackModifier->modify($out_dir . "/js/" . PathFunctions::getBaseName($file));
