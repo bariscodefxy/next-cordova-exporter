@@ -30,4 +30,13 @@ final class PathFunctions
     {
         return pathinfo($path, PATHINFO_EXTENSION);
     }
+
+    /**
+     * @param string $path
+     * @return array|string
+     */
+    public static function getDirName(string $path): array|string
+    {
+        return pathinfo($path, PATHINFO_DIRNAME);
+    }
 }

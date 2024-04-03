@@ -27,14 +27,6 @@ final class WebpackModifier extends LoggerClass
         $pattern = '/\/_next\//';
         $data = preg_replace($pattern, '/', $data);
 
-        // replace 'static/chunks/' to 'js/'
-        $pattern = '/static\/chunks\//';
-        $data = preg_replace($pattern, 'js/', $data);
-
-        // replace 'static/css/' to 'css/'
-        $pattern = '/static\/css\//';
-        $data = preg_replace($pattern, 'css/', $data);
-
         $file = fopen($filepath, "w");
         fwrite($file, $data);
         fclose($file);

@@ -1,15 +1,13 @@
 # next-cordova-exporter
-Export your next.js builds for Apache Cordova.
+Export your Next builds for Apache Cordova.
 
 ## Features
-* Convert Next.JS export to Apache Cordova `www/`.
+* Convert Next static export to Apache Cordova `www/`.
 * HTML converting.
 * JavaScript converting.
 * CSS converting.
-
-## To do
 * Image, Video, Font converting.
-* Converting as `static/xxx/` scheme.
+* Converting as Next's scheme (Example: `static/chunks/`, `static/media/`, `static/css/`).
 
 ## License
 ```

@@ -21,11 +21,8 @@ final class HtmlModifier extends LoggerClass
         $data = fread($file, filesize($from));
         fclose($file);
 
-        $pattern = "/\/_next\/static\/chunks\/(app\/)?/";
-        $data = preg_replace($pattern, "js/", $data);
-
-        $pattern = "/\/_next\/static\/css\/(app\/)?/";
-        $data = preg_replace($pattern, "css/", $data);
+        $pattern = "/\/_next\//";
+        $data = preg_replace($pattern, "/", $data);
 
         $file = fopen($to . DIRECTORY_SEPARATOR . PathFunctions::getBaseName($from), "w");
         fwrite($file, $data);

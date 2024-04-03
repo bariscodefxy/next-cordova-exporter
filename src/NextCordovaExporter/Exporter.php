@@ -63,21 +63,33 @@ final class Exporter
     private WebpackModifier $webpackModifier;
 
     /**
+     * @var string
+     */
+    private string $cordovaOutputDir;
+
+    /**
+     * @var Functions
+     */
+    public Functions $functions;
+
+    /**
      * Exporter constructor.
      * @param Logger $logger
      * @param string $directory
      */
-    public function __construct(Logger $logger, string $directory)
+    public function __construct(Logger $logger, string $directory, ?string $outdir = null)
     {
         $this->logger = $logger;
-        $this->directory = $directory;
-        $this->folderValidate = new FolderValidate($logger);
+        $this->functions = new Functions($this);
+        $this->directory = realpath($directory);
+        $this->folderValidate = new FolderValidate();
         $this->nextScan = new NextScan($logger);
         $this->folderScan = new FolderScan($logger);
         $this->htmlParser = new HtmlParser($logger);
-        $this->assetCopier = new AssetCopier($logger);
+        $this->assetCopier = new AssetCopier($this, $logger);
         $this->htmlModifier = new HtmlModifier($logger);
         $this->webpackModifier = new WebpackModifier($logger);
+        $this->cordovaOutputDir = $outdir ?? $this->directory . "_cordova";
         $this->startTime = floor(microtime(true) * 1000);
 
         $this->startScan();
@@ -104,20 +116,38 @@ final class Exporter
 
         $files = $this->folderScan->scanFiles($this->directory);
 
-        $out_dir = $this->directory . "_cordova";
-        @mkdir($out_dir);
+        @mkdir($this->cordovaOutputDir);
 
         foreach ($files as $file) {
-            $this->assetCopier->copy($file, $out_dir, PathFunctions::getExtension($file));
+            $this->assetCopier->copy($file, $this->cordovaOutputDir, PathFunctions::getExtension($file));
             if ( PathFunctions::getExtension($file) === "js" && str_starts_with(PathFunctions::getFileName($file), "webpack") )
             {
-                $this->webpackModifier->modify($out_dir . "/js/" . PathFunctions::getBaseName($file));
+                $this->webpackModifier->modify($this->cordovaOutputDir . DIRECTORY_SEPARATOR . $this->functions->getTmpDir($file));
             } else if ( PathFunctions::getExtension($file) === "html" )
             {
-                $this->htmlModifier->modify($file, $out_dir);
+                $this->htmlModifier->modify($file, $this->cordovaOutputDir);
             }
         }
 
         $this->logger->info("Exporting finished in " . abs(floor(microtime(true) * 1000) - $this->startTime) . "ms!");
+    }
+
+    /**
+     * @param string $var
+     * @return mixed
+     */
+    public function __get(string $var): mixed
+    {
+        return $this->{$var};
+    }
+
+    /**
+     * @param string $var
+     * @param mixed $val
+     * @return void
+     */
+    public function __set(string $var, mixed $val): void
+    {
+        $this->{$var} = $val;
     }
 }
